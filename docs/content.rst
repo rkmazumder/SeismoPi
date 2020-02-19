@@ -1,5 +1,11 @@
-Welcome to TSNet's documentation!
+Welcome to SeismoPi documentation!
 ======================================
+
+.. figure:: figures/SeismoPi.png
+   :scale: 100 %
+   :alt: Logo
+   
+*SeismoPi* is a Seismic damage analysis tool for buried pipelines.
 
 .. toctree::
    :maxdepth: 2
