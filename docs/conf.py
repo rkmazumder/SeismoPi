@@ -82,9 +82,9 @@ source_suffix = '.rst'
 master_doc = 'content'
 
 # General information about the project.
-project = u'TSNet'
-copyright = u"2019, Lu Xing"
-author = u"Lu Xing, Lina Sela"
+project = u'SeismoPi'
+copyright = u"2019, Ram Mazumder"
+author = u"Ram Mazumder, Yue Li"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
