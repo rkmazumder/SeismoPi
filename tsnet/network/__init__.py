@@ -6,6 +6,3 @@ The tsnet.network package contains methods to define
 4 .spatial and temporal discretization.
 
 """
-
-from .topology import topology
-from .model import TransientModel
