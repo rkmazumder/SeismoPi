@@ -6,6 +6,39 @@ parameters in the network during transient simulation.
 """
 
 class Distance:
+    
+    """Figure out the topology of the network
+    Parameters
+    ----------
+    wn : wntr.network.model.WaterNetworkModel
+        .inp file used for EPAnet simulation
+    npipe : integer
+        Number of pipes
+    Returns
+    -------
+    links1 : list
+        The id of adjacent pipe on the start node.
+        The sign represents the direction of the pipe.
+        + : flowing into the junction
+        - : flowing out from the junction
+    links2 : list
+        The id of adjacent pipe on the end node.
+        The sign represents the direction of the pipe.
+        + : flowing into the junction
+        - : flowing out from the junction
+    utype : list
+        The type of the upstream adjacent links.
+        If the link is not pipe, the name of that link
+        will also be included.
+        If there is no upstream link, the type of the start node
+        will be recorded.
+    dtype : list
+        The type of the downstream adjacent links.
+        If the link is not pipe, the name of that link
+        will also be included.
+        If there is no downstream link, the type of the end node
+        will be recorded.
+    """
     # Constructor
     def __init__(self, ex, ey, M):
         self.ex = ex  # Create an instance variable
