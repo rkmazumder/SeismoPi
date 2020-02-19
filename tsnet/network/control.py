@@ -4,201 +4,54 @@ network controls of the pump and valve.These control modify
 parameters in the network during transient simulation.
 
 """
+
 import numpy as np
+import pandas as pd
+from scipy.spatial import distance
+import matplotlib.pyplot as plt
+import networkx as nx
 
-def valveclosing(dt, tf, valve_op):
-    """Define valve operation curve (percentage open v.s. time)
+class Distance:
+    # Constructor
+    def __init__(self, ex, ey, M):
+        self.ex = ex  # Create an instance variable
+        self.ey = ey
+        self.M=Mag
+    def com_pga_dist(data,ex,ey,Mag):
+        r = []
+        PGA = []
+        PGV = []
+        pos = {}
+        for index, row in data.iterrows():
+            x = row['x']
+            y = row['y']
+            dist = distance.euclidean((ex,ey), (x,y))/1000
+            P = (403.8*np.power(10, 0.265*Mag)*np.power(dist+30, -1.218))/981
+            V = (np.power(10, -0.848 + 0.775*Mag + -1.834*np.log10(dist+17)))/100
+            r.append(dist)
+            PGA.append(P)
+            PGV.append(V)
+            pos[int(row['id'])]=(x,y)
+        r = np.array(r)
+        PGA = np.array(PGA)
+        PGV = np.array(PGV)
+        return r, PGA, PGV, pos
 
-    Parameters
-    ----------
-    dt : float
-        Time step
-    tf : float
-        Simulation Time
-    valve_op : list
-        Contains parameters to define valve operation rule
-        valve_op = [tc,ts,se,m]
-        tc : the duration takes to close the valve [s]
-        ts : closure start time [s]
-        se : final open percentage [s]
-        m  : closure constant [unitless]
-
-    Returns
-    -------
-    s : list
-        valve operation curve
-    """
-
-    [tc,ts,se,m] = valve_op
-    tn = int(tf/dt)
-    # abrupt closure
-    if tc ==0:
-        s =  np.array([(1- (i*dt- ts))**1    for i in range(tn)])
-        s[s>1] = 1
-        s[s<1] = se
-    # gradual closure
-    else:
-        t = np.array([(i*dt- ts)/tc for i in range(tn)])
-        t[t>1] = 1
-        t[t<0] = 0
-        s =  np.array([1 - (1-se)*t[i]**m for i in range(tn)])
-        s[s>1] = 1
-        s[s<se] = se
-
-    return s
-
-
-def valveopening(dt, tf, valve_op):
-    """Define valve operation curve (percentage open v.s. time)
-
-    Parameters
-    ----------
-    dt : float
-        Time step
-    tf : float
-        Simulation Time
-    valve_op : list
-        Contains parameters to define valve operation rule
-        valve_op = [tc,ts,se,m]
-        tc : the duration takes to close the valve [s]
-        ts : closure start time [s]
-        se : final open percentage [s]
-        m  : closure constant [unitless]
-
-    Returns
-    -------
-    s : list
-        valve operation curve
-    """
-
-    [tc,ts,se,m] = valve_op
-    tn = int(tf/dt)
-    # abrupt opening
-    if tc ==0:
-        s =  np.array([((i*dt- ts))**1    for i in range(tn)])
-        s[s>0] = se
-        s[s<0] = 0
-    # gradual opening
-    else:
-        t = np.array([(i*dt- ts)/tc for i in range(tn)])
-        t[t>1] = 1
-        t[t<0] = 0
-        s =  np.array([se* (t[i])**m for i in range(tn)])
-        s[s<0] = 0
-        s[s>se] = se
-    return s
-
-def pumpclosing(dt, tf, pump_op):
-    """Define pump operation curve (percentage open v.s. time)
-
-    Parameters
-    ----------
-    dt : float
-        Time step
-    tf : float
-        Simulation Time
-    valve_op : list
-        Contains parameters to define valve operation rule
-        valve_op = [tc,ts,se,m]
-        tc : the duration takes to close the valve [s]
-        ts : closure start time [s]
-        se : final open percentage [s]
-        m  : closure constant [unitless]
-
-    Returns
-    -------
-    s : list
-        valve operation curve
-    """
-    [tc,ts,se,m] = pump_op
-    # do not allow the pump to be fully closed due to numerical issues
-    if se == 0.:
-        se = 0.0001
-
-    tn = int(tf/dt)
-    # gradual closure
-    if tc != 0:
-        s =  np.array([(1- (i*dt- ts)/tc)**m    for i in range(tn)])
-        s[s>1] = 1
-        s[s<se] = se
-
-    # abrupt closure
-    if tc ==0:
-        t = np.array([(i*dt- ts)/tc for i in range(tn)])
-        t[t>1] = 1
-        t[t<0] = 0
-        s =  np.array([1 - (1-se)*t[i]**m for i in range(tn)])
-        s[s>1] = 1
-        s[s<se] = se
-    return s
-
-def pumpopening(dt, tf, pump_op):
-    """Define pump operation curve (percentage open v.s. time)
-
-    Parameters
-    ----------
-    dt : float
-        Time step
-    tf : float
-        Simulation Time
-    pump_op : list
-        Contains parameters to define pump operation rule
-        pump_op = [tc,ts,se,m]
-        tc : the duration takes to start up the pump [s]
-        ts : open start time [s]
-        se : final open percentage [s]
-        m  : closure constant [unitless]
-
-    Returns
-    -------
-    s : list
-        valve operation curve
-    """
-
-    [tc,ts,se,m] = pump_op
-    tn = int(tf/dt)
-    # abrupt opening
-    if tc ==0:
-        s =  np.array([((i*dt- ts))**1    for i in range(tn)])
-        s[s>0] = se
-        s[s<0] = 0
-    # gradual opening
-    else:
-        t = np.array([(i*dt- ts)/tc for i in range(tn)])
-        t[t>1] = 1
-        t[t<0] = 0
-        s =  np.array([se* (t[i])**m for i in range(tn)])
-        s[s<0] = 0
-        s[s>se] = se
-    return s
-
-def burstsetting(dt,tf,ts,tc,final_burst_coeff):
-    """ Calculate the burst area as a function of simulation time
-
-    Parameters
-    ----------
-    dt : float
-        Time step
-    tf : float
-        Simulation Time
-    ts : float
-        Burst start time
-    tc : float
-        Time for burst to fully develop
-    final_burst_coeff : list or float
-        Final emitter coefficient at the burst nodes
-    """
-
-    tn = int(tf/dt)
-    if tc !=0 :
-        s = np.array([(i*dt- ts)/tc    for i in range(tn)])
-        s[s>1] = 1
-        s[s<0] = 0
-        burst_A = final_burst_coeff * s
-    else:
-        s = np.array([(i*dt- ts)    for i in range(tn)])
-        s[s>0] = 1
-        s[s<0] = 0
-        burst_A = final_burst_coeff * s
-
-    return burst_A
+    def pga_for_link(link,node,ex,ey,Mag):
+        r = []
+        PGA = []
+        PGV = []
+        for index, row in link.iterrows():
+            start_node = row['start_node']
+            end_node = row['end_node']
+            start_x, start_y = node.loc[node['id']==start_node, ['x','y']].values[0]
+            end_x, end_y = node.loc[node['id']==end_node, ['x','y']].values[0]
+            dist_start = distance.euclidean((ex,ey), (start_x,start_y))/1000
+            P_start = (403.8*np.power(10, 0.265*Mag)*np.power(dist_start+30, -1.218))/980
+            V_start = (np.power(10, -0.848 + 0.775*Mag + -1.834*np.log10(dist_start+17)))/100
+            dist_end = distance.euclidean((ex,ey), (end_x,end_y))/1000
+            P_end = 403.8*np.power(10, 0.265*Mag)*np.power(dist_end+30, -1.218)/980
+            V_end = (np.power(10, -0.848 + 0.775*Mag + -1.834*np.log10(dist_end+17)))/100
+            PGA.append((P_start+P_end)/2)
+            PGV.append((V_start+V_end)/2)
+        return PGA, PGV
