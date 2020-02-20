@@ -2,12 +2,6 @@
 This file to for correction factor
 """
 
-import numpy as np
-import pandas as pd
-from scipy.spatial import distance
-import matplotlib.pyplot as plt
-import networkx as nx
-
 def correction_factor(pipe_characteristics, M_type=None, soil_type=None, age=None):
 
     # Make sure the values are strings
