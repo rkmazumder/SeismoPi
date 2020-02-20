@@ -4,7 +4,7 @@ Transient Modeling Framework
 The framework of performing transient simulation using TSNet is shown in :numref:`flowchart`
 
 .. _flowchart:
-.. figure:: figures/flowchart.PNG
+.. figure:: figures/FrameworkFlow.png
    :width: 400
    :alt: flowchart
 
