@@ -4,7 +4,7 @@ Getting Started
 
 To use tsnet in a project, open a Python console and import the package::
 
-    import tsnet
+    import SeismoPi
 
 Simple example
 ---------------
@@ -12,17 +12,7 @@ Simple example
 A simple example, Tnet1_valve_closure.py is included in the examples folder.
 This example demonstrates how to:
 
-* Import tsnet
-
-* Generate a transient model
-
-* Set wave speed
-
-* Set time step and simulation period
-
-* Perform initial condition calculation
-
-* Define valve closure rule
+* Import SeismoPi
 
 * Run transient simulation and save results to .obj file
 
