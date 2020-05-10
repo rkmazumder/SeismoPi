@@ -1,6 +1,6 @@
-==================================
-Transient Modeling Framework
-==================================
+============================================
+Damage and Renewal Cost Estimation Framework
+============================================
 The framework of performing transient simulation using TSNet is shown in :numref:`flowchart`
 
 .. _flowchart:
